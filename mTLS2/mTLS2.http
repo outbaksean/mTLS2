@@ -1,0 +1,6 @@
+@mTLS2_HostAddress = http://localhost:5030
+
+GET {{mTLS2_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
