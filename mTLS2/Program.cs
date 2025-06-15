@@ -1,8 +1,21 @@
+using Microsoft.AspNetCore.Authentication.Certificate;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddAuthentication(CertificateAuthenticationDefaults.AuthenticationScheme)
+    .AddCertificate(options => // Optional: configure certificate validation
+    {
+        options.AllowedCertificateTypes = CertificateTypes.All; // Example: Allow all cert types
+        // Add more validation options here if needed, e.g.,
+        // options.ValidateCertificateUse = true;
+        // options.ValidateValidityPeriod = true;
+        // options.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck; // Example
+    });
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
@@ -25,6 +38,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
             certPath,
             certPassword
         );
+        listenOptions.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
     });
 });
 
@@ -34,6 +48,7 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
